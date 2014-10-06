@@ -11,7 +11,7 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.RestoreCart
     {
         public void Process(RestoreCartArgs args)
         {
-            if (CartPersistenceContext.CustomerRestoreStrategyGlobalSetting == CustomerRestoreStrategy.None)
+            if (CartPersistenceContext.CustomerRestoreStrategy == CustomerRestoreStrategy.None)
             {
                 return;
             }
@@ -21,8 +21,14 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.RestoreCart
             {
                 return;
             }
-            
-            if (CartPersistenceContext.CustomerRestoreStrategyGlobalSetting == CustomerRestoreStrategy.Overwrite)
+
+            if (CartPersistenceContext.CustomerRestoreStrategy == CustomerRestoreStrategy.OverwriteIfEmpty &&
+                args.CartItems.Any() || args.ShoppingCart.ShoppingCartLines.Any())
+            {
+                return;
+            }
+
+            if (CartPersistenceContext.CustomerRestoreStrategy == CustomerRestoreStrategy.Overwrite)
             {
                 args.CartItems.Clear();
                 using (args.ShoppingCart.DisableEvents(false))
@@ -31,12 +37,14 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.RestoreCart
                 }
             }
 
-            if (!string.IsNullOrEmpty(user.CustomProperties[PersistToCustomer.CouponCodeKey]))
+            var customerCoupon = user.CustomProperties[PersistToCustomer.CouponCodeKey];
+            if (!string.IsNullOrEmpty(customerCoupon) && customerCoupon != PersistToCustomer.EmptyCart)
             {
                 args.CouponCode = user.CustomProperties[PersistToCustomer.CouponCodeKey];
             }
 
-            if (!string.IsNullOrEmpty(user.CustomProperties[PersistToCustomer.CartItemsKey]))
+            var customerCart = user.CustomProperties[PersistToCustomer.CartItemsKey];
+            if (!string.IsNullOrEmpty(customerCart) && customerCart != PersistToCustomer.EmptyCart)
             {
                 if (args.CartItems == null)
                 {

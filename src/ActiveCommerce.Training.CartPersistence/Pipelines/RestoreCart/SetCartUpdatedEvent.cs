@@ -11,8 +11,7 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.RestoreCart
     {
         public void Process(RestoreCartArgs args)
         {
-            args.ShoppingCart.CartChanged  += CartsUpdatedHandler.CartUpdated;
-
+            args.ShoppingCart.CartChanged  += CartUpdatedHandler.CartUpdated;
             CartPersistenceContext.CartUpdatedEventInitialized = true;
         }
     }

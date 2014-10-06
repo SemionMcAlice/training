@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 using ActiveCommerce.Training.CartPersistence.Common;
 using Sitecore.Diagnostics;
 using Sitecore.Ecommerce.DomainModel.Users;
@@ -16,7 +17,7 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.Analytics
         {
             try
             {
-                if (!PersistingIsActive())
+                if (!PersistenceActive())
                 {
                     return;
                 }
@@ -34,12 +35,16 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.Analytics
                 };
                 RestoreCartPipeline.Run(restoreProductArgs);
             }
-            catch (Exception exception)
+            catch (Exception e)
             {
-                Log.Error("Error occured in the Cart Persistence Loader.", exception);
+                Log.Error("Error loading shopping cart from persistent store", e, this);
             }
         }
 
+        protected virtual bool PersistenceActive()
+        {
+            return CartPersistenceContext.IsActive && Sitecore.Context.Database != null && HttpContext.Current.Session != null;
+        }
         protected virtual bool PersistingIsActive()
         {
             if (!CartPersistenceContext.IsActive || !Sitecore.Analytics.Tracker.IsActive)

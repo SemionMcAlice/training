@@ -9,6 +9,7 @@ namespace ActiveCommerce.Training.CartPersistence.Common
     {
         None = 0,
         Merge = 1,
-        Overwrite = 2
+        Overwrite = 2,
+        OverwriteIfEmpty = 3
     }
 }

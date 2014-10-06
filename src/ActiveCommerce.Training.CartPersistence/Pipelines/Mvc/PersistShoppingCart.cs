@@ -4,7 +4,7 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.Mvc
 {
     public class PersistShoppingCart : Analytics.PersistShoppingCart
     {
-        protected override bool PersistingIsActive()
+        protected override bool PersistenceActive()
         {
             return CartPersistenceContext.IsActive;
         }

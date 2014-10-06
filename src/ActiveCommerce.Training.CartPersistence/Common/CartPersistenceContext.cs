@@ -7,9 +7,9 @@ namespace ActiveCommerce.Training.CartPersistence.Common
 {
     public static class CartPersistenceContext
     {
-        private const string _requestCartUpdatedKey = "AC_PERSISTENCE_CART_UPDATED";
-        private const string _sessionCartInitializedKey = "AC_PERSISTENCE_CART_INITIALIZED";
-        private const string _sessionCartUpdatedEventInitializedKey = "AC_PERSISTENCE_CART_UPDATE_INITIALIZED";
+        private const string RequestCartUpdatedKey = "AC_PERSISTENCE_CART_UPDATED";
+        private const string SessionCartInitializedKey = "AC_PERSISTENCE_CART_INITIALIZED";
+        private const string SessionCartUpdatedEventInitializedKey = "AC_PERSISTENCE_CART_UPDATE_INITIALIZED";
 
         /// <summary>
         /// Property to determine if the cart has been updated during the current Request.
@@ -23,12 +23,12 @@ namespace ActiveCommerce.Training.CartPersistence.Common
                     return false;
                 }
 
-                if (!HttpContext.Current.Items.Contains(_requestCartUpdatedKey))
+                if (!HttpContext.Current.Items.Contains(RequestCartUpdatedKey))
                 {
                     return false;
                 }
 
-                var value = HttpContext.Current.Items[_requestCartUpdatedKey];
+                var value = HttpContext.Current.Items[RequestCartUpdatedKey];
 
                 if (value == null)
                 {
@@ -37,7 +37,10 @@ namespace ActiveCommerce.Training.CartPersistence.Common
 
                 return (bool) value;
             }
-            set { HttpContext.Current.Items[_requestCartUpdatedKey] = value; }
+            set
+            {
+                HttpContext.Current.Items[RequestCartUpdatedKey] = value;
+            }
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace ActiveCommerce.Training.CartPersistence.Common
         /// Meaning if the persistent restore pipelines have run.
         /// This is so we only run the restore the first time.
         /// </summary>
-        public static bool CartSessionInitialized {
+        public static bool PersistenceInitialized {
             get
             {
                 if (HttpContext.Current == null || HttpContext.Current.Items.Count == 0)
@@ -53,12 +56,12 @@ namespace ActiveCommerce.Training.CartPersistence.Common
                     return false;
                 }
 
-                if (HttpContext.Current.Session[_sessionCartInitializedKey] == null)
+                if (HttpContext.Current.Session[SessionCartInitializedKey] == null)
                 {
                     return false;
                 }
 
-                var value = HttpContext.Current.Session[_sessionCartInitializedKey];
+                var value = HttpContext.Current.Session[SessionCartInitializedKey];
 
                 if (value == null)
                 {
@@ -67,7 +70,10 @@ namespace ActiveCommerce.Training.CartPersistence.Common
 
                 return (bool)value;
             }
-            set { HttpContext.Current.Session[_sessionCartInitializedKey] = value; }
+            set
+            {
+                HttpContext.Current.Session[SessionCartInitializedKey] = value;
+            }
         }
 
         /// <summary>
@@ -82,12 +88,12 @@ namespace ActiveCommerce.Training.CartPersistence.Common
                     return false;
                 }
 
-                if (HttpContext.Current.Session[_sessionCartUpdatedEventInitializedKey] == null)
+                if (HttpContext.Current.Session[SessionCartUpdatedEventInitializedKey] == null)
                 {
                     return false;
                 }
 
-                var value = HttpContext.Current.Session[_sessionCartUpdatedEventInitializedKey];
+                var value = HttpContext.Current.Session[SessionCartUpdatedEventInitializedKey];
 
                 if (value == null)
                 {
@@ -96,7 +102,10 @@ namespace ActiveCommerce.Training.CartPersistence.Common
 
                 return (bool)value;
             }
-            set { HttpContext.Current.Session[_sessionCartUpdatedEventInitializedKey] = value; }
+            set
+            {
+                HttpContext.Current.Session[SessionCartUpdatedEventInitializedKey] = value;
+            }
         }
 
 
@@ -108,13 +117,11 @@ namespace ActiveCommerce.Training.CartPersistence.Common
             get
             {
                 var settingValue = Sitecore.Configuration.Settings.GetSetting("ActiveCommerce.Cart.Persistence.Active");
-
                 var active = false;
                 if (bool.TryParse(settingValue, out active))
                 {
                     return active;
                 }
-
                 return false;
             }
         }
@@ -122,18 +129,16 @@ namespace ActiveCommerce.Training.CartPersistence.Common
         /// <summary>
         /// Property to get the globally defined Customer Restore Strategy.
         /// </summary>
-        public static CustomerRestoreStrategy CustomerRestoreStrategyGlobalSetting
+        public static CustomerRestoreStrategy CustomerRestoreStrategy
         {
             get
             {
                 var settingValue = Sitecore.Configuration.Settings.GetSetting("ActiveCommerce.Cart.Persistence.CustomerRestoreStrategy");
-                
-                var enumValue = CustomerRestoreStrategy.None;
+                CustomerRestoreStrategy enumValue;
                 if (Enum.TryParse(settingValue, true, out enumValue))
                 {
                     return enumValue;
                 }
-
                 return CustomerRestoreStrategy.None;
             }
         }

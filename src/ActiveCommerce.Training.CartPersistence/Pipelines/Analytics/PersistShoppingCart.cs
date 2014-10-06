@@ -1,4 +1,5 @@
-﻿using ActiveCommerce.Training.CartPersistence.Common;
+﻿using System.Web;
+using ActiveCommerce.Training.CartPersistence.Common;
 using ActiveCommerce.Training.CartPersistence.Pipelines.PersistCart;
 using Sitecore.Diagnostics;
 using Sitecore.Ecommerce.DomainModel.Carts;
@@ -15,24 +16,28 @@ namespace ActiveCommerce.Training.CartPersistence.Pipelines.Analytics
         {
             try
             {
-                if (!PersistingIsActive())
+                if (!PersistenceActive())
                 {
                     return;
                 }
 
                 var persistCartArgs = new PersistCartArgs
                 {
-                ShoppingCart = Sitecore.Ecommerce.Context.Entity.GetInstance<ShoppingCart>() as ActiveCommerce.Carts.ShoppingCart,
+                    ShoppingCart = Sitecore.Ecommerce.Context.Entity.GetInstance<ShoppingCart>() as ActiveCommerce.Carts.ShoppingCart,
                     CustomerManager = Sitecore.Ecommerce.Context.Entity.Resolve<ICustomerManager<CustomerInfo>>()
                 };
                 PersistCartPipeline.Run(persistCartArgs);
             }
-            catch (Exception exception)
+            catch (Exception e)
             {
-                Log.Error("Error occured in the Cart Persistence persist pipeline.", exception);
+                Log.Error("Error persisting shopping cart", e, this);
             }
         }
 
+        protected virtual bool PersistenceActive()
+        {
+            return CartPersistenceContext.IsActive && Sitecore.Context.Database != null && HttpContext.Current.Session != null;
+        }
         protected virtual bool PersistingIsActive()
         {
             if (!CartPersistenceContext.IsActive || !Sitecore.Analytics.Tracker.IsActive)

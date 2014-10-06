@@ -26,6 +26,7 @@ namespace ActiveCommerce.Training.CartPersistence.Users
             {
                 var restoreProductArgs = new RestoreCartArgs
                 {
+                    ForceRestore = true,
                     CartManager = Sitecore.Ecommerce.Context.Entity.Resolve<IShoppingCartManager>(),
                     ShoppingCart = Sitecore.Ecommerce.Context.Entity.GetInstance<ShoppingCart>() as ActiveCommerce.Carts.ShoppingCart,
                     StockManager = Sitecore.Ecommerce.Context.Entity.Resolve<IProductStockManager>(),
